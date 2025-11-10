@@ -17,7 +17,6 @@ package org.codehaus.plexus.components.io.resources;
  */
 
 import javax.inject.Named;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +57,7 @@ public class PlexusIoFileResourceCollection extends AbstractPlexusIoResourceColl
 
     public PlexusIoFileResourceCollection() {}
 
+    @Override
     public PlexusIoResource resolve(final PlexusIoResource resource) throws IOException {
         return resource;
     }
@@ -159,8 +159,10 @@ public class PlexusIoFileResourceCollection extends AbstractPlexusIoResourceColl
         }
     }
 
+    @Override
     public Stream stream() {
         return new Stream() {
+            @Override
             public void forEach(PlexusIoResourceConsumer resourceConsumer) throws IOException {
                 Iterator<PlexusIoResource> resources = getResources();
                 while (resources.hasNext()) {
@@ -180,6 +182,7 @@ public class PlexusIoFileResourceCollection extends AbstractPlexusIoResourceColl
                 while (resources.hasNext()) {
                     final PlexusIoResource next = resources.next();
                     Callable future = new Callable() {
+                        @Override
                         public Object call() throws Exception {
                             resourceConsumer.accept(next);
                             return this;
@@ -194,6 +197,7 @@ public class PlexusIoFileResourceCollection extends AbstractPlexusIoResourceColl
         };
     }
 
+    @Override
     public Iterator<PlexusIoResource> getResources() throws IOException {
         final DirectoryScanner ds = new DirectoryScanner();
         final File dir = getBaseDir();
@@ -225,6 +229,7 @@ public class PlexusIoFileResourceCollection extends AbstractPlexusIoResourceColl
         return result.iterator();
     }
 
+    @Override
     public boolean isConcurrentAccessSupported() {
         return true;
     }

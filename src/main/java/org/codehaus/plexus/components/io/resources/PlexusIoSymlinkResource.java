@@ -1,7 +1,5 @@
 package org.codehaus.plexus.components.io.resources;
 
-import javax.annotation.Nonnull;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -14,28 +12,28 @@ public class PlexusIoSymlinkResource extends PlexusIoFileResource implements Sym
     private final String symLinkDestination;
     private final PlexusIoFileResource targetResource;
 
-    PlexusIoSymlinkResource(@Nonnull File symlinkfile, String name, @Nonnull PlexusIoResourceAttributes attrs)
+    PlexusIoSymlinkResource(File symlinkfile, String name, PlexusIoResourceAttributes attrs)
             throws IOException {
         this(symlinkfile, name, attrs, symlinkfile.toPath());
     }
 
     PlexusIoSymlinkResource(
-            @Nonnull File symlinkfile, String name, @Nonnull PlexusIoResourceAttributes attrs, Path linkPath)
+            File symlinkfile, String name, PlexusIoResourceAttributes attrs, Path linkPath)
             throws IOException {
         this(symlinkfile, name, attrs, linkPath, java.nio.file.Files.readSymbolicLink(linkPath));
     }
 
     private PlexusIoSymlinkResource(
-            @Nonnull File symlinkfile, String name, @Nonnull PlexusIoResourceAttributes attrs, Path path, Path linkPath)
+            File symlinkfile, String name, PlexusIoResourceAttributes attrs, Path path, Path linkPath)
             throws IOException {
         this(symlinkfile, name, attrs, linkPath.toString(), (PlexusIoFileResource)
                 ResourceFactory.createResource(path.resolveSibling(linkPath).toFile()));
     }
 
     private PlexusIoSymlinkResource(
-            @Nonnull File symlinkfile,
+            File symlinkfile,
             String name,
-            @Nonnull PlexusIoResourceAttributes attrs,
+            PlexusIoResourceAttributes attrs,
             String symLinkDestination,
             PlexusIoFileResource targetResource)
             throws IOException {
@@ -44,6 +42,7 @@ public class PlexusIoSymlinkResource extends PlexusIoFileResource implements Sym
         this.targetResource = targetResource;
     }
 
+    @Override
     public String getSymlinkDestination() throws IOException {
         return symLinkDestination;
     }
@@ -61,11 +60,11 @@ public class PlexusIoSymlinkResource extends PlexusIoFileResource implements Sym
         DeferredFileOutputStream dfos = getDfos();
         if (dfos == null) {
             return targetResource.getSize();
-        } else if (dfos.isInMemory()) {
-            return dfos.getByteCount();
-        } else {
-            return dfos.getFile().length();
         }
+        if (dfos.isInMemory()) {
+            return dfos.getByteCount();
+        }
+        return dfos.getFile().length();
     }
 
     @Override

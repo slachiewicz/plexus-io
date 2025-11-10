@@ -1,23 +1,5 @@
 package org.codehaus.plexus.components.io.resources;
 
-/*
- * Copyright 2007 The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import javax.annotation.Nonnull;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,28 +26,25 @@ import static java.util.Objects.requireNonNull;
  */
 public class PlexusIoFileResource extends AbstractPlexusIoResource implements ResourceAttributeSupplier, FileSupplier {
 
-    @Nonnull
     private final File file;
 
-    @Nonnull
     private final PlexusIoResourceAttributes attributes;
 
-    @Nonnull
     private final FileAttributes fileAttributes;
 
     private final ContentSupplier contentSupplier;
 
     private final DeferredFileOutputStream dfos;
 
-    protected PlexusIoFileResource(@Nonnull File file, @Nonnull String name, @Nonnull PlexusIoResourceAttributes attrs)
+    protected PlexusIoFileResource(File file, String name, PlexusIoResourceAttributes attrs)
             throws IOException {
         this(file, name, attrs, null, null);
     }
 
     PlexusIoFileResource(
-            @Nonnull final File file,
-            @Nonnull String name,
-            @Nonnull PlexusIoResourceAttributes attrs,
+            final File file,
+            String name,
+            PlexusIoResourceAttributes attrs,
             final ContentSupplier contentSupplier,
             final InputStreamTransformer streamTransformer)
             throws IOException {
@@ -73,10 +52,10 @@ public class PlexusIoFileResource extends AbstractPlexusIoResource implements Re
     }
 
     PlexusIoFileResource(
-            @Nonnull final File file,
-            @Nonnull String name,
-            @Nonnull PlexusIoResourceAttributes attrs,
-            @Nonnull FileAttributes fileAttributes,
+            final File file,
+            String name,
+            PlexusIoResourceAttributes attrs,
+            FileAttributes fileAttributes,
             final ContentSupplier contentSupplier,
             final InputStreamTransformer streamTransformer)
             throws IOException {
@@ -86,10 +65,10 @@ public class PlexusIoFileResource extends AbstractPlexusIoResource implements Re
                 fileAttributes.getSize(),
                 fileAttributes.isRegularFile(),
                 fileAttributes.isDirectory(),
-                fileAttributes.isRegularFile()
-                        || fileAttributes.isDirectory()
-                        || fileAttributes.isSymbolicLink()
-                        || fileAttributes.isOther());
+                fileAttributes.isRegularFile() ||
+                        fileAttributes.isDirectory() ||
+                        fileAttributes.isSymbolicLink() ||
+                        fileAttributes.isOther());
         this.file = file;
         this.attributes = requireNonNull(attrs, "attributes is null for file " + file.getName());
         this.fileAttributes = requireNonNull(fileAttributes, "fileAttributes is null for file " + file.getName());
@@ -102,7 +81,7 @@ public class PlexusIoFileResource extends AbstractPlexusIoResource implements Re
     }
 
     private static DeferredFileOutputStream asDeferredStream(
-            @Nonnull ContentSupplier supplier, @Nonnull InputStreamTransformer transToUse, PlexusIoResource resource)
+            ContentSupplier supplier, InputStreamTransformer transToUse, PlexusIoResource resource)
             throws IOException {
         DeferredFileOutputStream dfos = DeferredFileOutputStream.builder()
                 .setThreshold(5000000)
@@ -127,50 +106,51 @@ public class PlexusIoFileResource extends AbstractPlexusIoResource implements Re
     /**
      * Returns the resource file.
      */
-    @Nonnull
+    @Override
     public File getFile() {
         return file;
     }
 
-    @Nonnull
+    @Override
     public InputStream getContents() throws IOException {
         if (dfos == null) {
             return contentSupplier.getContents();
         }
         if (dfos.isInMemory()) {
             return new ByteArrayInputStream(dfos.getData());
-        } else {
-            return new FileInputStream(dfos.getFile()) {
-                @SuppressWarnings("ResultOfMethodCallIgnored")
-                @Override
-                public void close() throws IOException {
-                    super.close();
-                    dfos.getFile().delete();
-                }
-            };
         }
+        return new FileInputStream(dfos.getFile()) {
+            @SuppressWarnings("ResultOfMethodCallIgnored")
+            @Override
+            public void close() throws IOException {
+                super.close();
+                dfos.getFile().delete();
+            }
+        };
     }
 
-    @Nonnull
+    @Override
     public URL getURL() throws IOException {
         return getFile().toURI().toURL();
     }
 
+    @Override
     public long getSize() {
         if (dfos == null) {
             return fileAttributes.getSize();
         }
         if (dfos.isInMemory()) {
             return dfos.getByteCount();
-        } else {
-            return dfos.getFile().length();
         }
+        return dfos.getFile().length();
     }
 
+    @Override
     public boolean isDirectory() {
         return fileAttributes.isDirectory();
     }
 
+    @Override
     public boolean isExisting() {
         if (attributes instanceof FileAttributes) {
             return true;
@@ -178,20 +158,21 @@ public class PlexusIoFileResource extends AbstractPlexusIoResource implements Re
         return getFile().exists();
     }
 
+    @Override
     public boolean isFile() {
         return fileAttributes.isRegularFile();
     }
 
-    @Nonnull
+    @Override
     public PlexusIoResourceAttributes getAttributes() {
         return attributes;
     }
 
-    @Nonnull
     public FileAttributes getFileAttributes() {
         return fileAttributes;
     }
 
+    @Override
     public long getLastModified() {
         FileTime lastModified = fileAttributes.getLastModifiedTime();
         if (lastModified != null) {

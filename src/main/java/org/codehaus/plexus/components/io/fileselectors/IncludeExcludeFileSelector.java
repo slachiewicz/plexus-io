@@ -1,30 +1,12 @@
 package org.codehaus.plexus.components.io.fileselectors;
 
-/*
- * Copyright 2007 The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Named;
-
 import java.io.File;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.MatchPatterns;
 import org.codehaus.plexus.util.SelectorUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This file selector uses a set of patterns for including/excluding
@@ -61,7 +43,7 @@ public class IncludeExcludeFileSelector implements FileSelector {
      * @return <code>true</code> when the name matches against at least one
      *         exclude pattern, or <code>false</code> otherwise.
      */
-    protected boolean isExcluded(@Nonnull String name) {
+    protected boolean isExcluded(String name) {
         return computedExcludes.matches(name, isCaseSensitive);
     }
 
@@ -92,11 +74,11 @@ public class IncludeExcludeFileSelector implements FileSelector {
         }
     }
 
-    private static @Nonnull String getCanonicalName(@Nonnull String pName) {
+    private static String getCanonicalName(String pName) {
         return pName.replace('/', File.separatorChar).replace('\\', File.separatorChar);
     }
 
-    private String asPattern(@Nonnull String pPattern) {
+    private String asPattern(String pPattern) {
         String pattern = getCanonicalName(pPattern.trim());
         if (pattern.endsWith(File.separator)) {
             pattern += "**";
@@ -166,7 +148,7 @@ public class IncludeExcludeFileSelector implements FileSelector {
      * @param isCaseSensitive Whether the pattern is case sensitive.
      * @return True, if the pattern matches, otherwise false
      */
-    protected boolean matchPath(@Nonnull String pattern, @Nonnull String name, boolean isCaseSensitive) {
+    protected boolean matchPath(String pattern, String name, boolean isCaseSensitive) {
         return SelectorUtils.matchPath(pattern, name, isCaseSensitive);
     }
 
@@ -178,11 +160,12 @@ public class IncludeExcludeFileSelector implements FileSelector {
      * @return <code>true</code> when the name matches against at least one
      *         include pattern, or <code>false</code> otherwise.
      */
-    protected boolean isIncluded(@Nonnull String name) {
+    protected boolean isIncluded(String name) {
         return computedIncludes.matches(name, isCaseSensitive);
     }
 
-    public boolean isSelected(@Nonnull FileInfo fileInfo) {
+    @Override
+    public boolean isSelected(FileInfo fileInfo) {
         final String name = getCanonicalName(fileInfo.getName());
         return isIncluded(name) && !isExcluded(name);
     }

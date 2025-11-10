@@ -15,8 +15,6 @@
  */
 package org.codehaus.plexus.components.io.resources.proxy;
 
-import javax.annotation.Nonnull;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -36,7 +34,7 @@ class ResourceInvocationHandler implements InvocationHandler {
     private final SymlinkDestinationSupplier symlinkDestinationSupplier;
     private final ResourceAttributeSupplier resourceAttributeSupplier;
 
-    public ResourceInvocationHandler(@Nonnull PlexusIoResource target, Object alternativeHandler) {
+    public ResourceInvocationHandler(PlexusIoResource target, Object alternativeHandler) {
         this.testImpl = target;
         this.contentSupplier = asOrNull(alternativeHandler, ContentSupplier.class);
         this.nameSupplier = asOrNull(alternativeHandler, NameSupplier.class);
@@ -48,9 +46,10 @@ class ResourceInvocationHandler implements InvocationHandler {
     @SuppressWarnings("unchecked")
     private static <T> T asOrNull(Object instance, Class<T> clazz) {
         if (instance != null && clazz.isAssignableFrom(instance.getClass())) return (T) instance;
-        else return null;
+        return null;
     }
 
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String name = method.getName();
         if (contentSupplier != null && "getContents".equals(name)) {

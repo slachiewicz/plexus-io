@@ -1,23 +1,5 @@
 package org.codehaus.plexus.components.io.resources.proxy;
 
-/*
- * Copyright 2007 The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import javax.annotation.Nonnull;
-
 import java.io.Closeable;
 import java.io.InputStream;
 import java.net.URL;
@@ -27,6 +9,7 @@ import org.codehaus.plexus.components.io.resources.AbstractPlexusIoResource;
 import org.codehaus.plexus.components.io.resources.AbstractPlexusIoResourceCollection;
 import org.codehaus.plexus.components.io.resources.PlexusIoResource;
 import org.codehaus.plexus.components.io.resources.Stream;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -59,10 +42,12 @@ class PlexusIoProxyResourceCollectionTest {
 
         boolean closed = false;
 
+        @Override
         public void close() {
             closed = true;
         }
 
+        @Override
         public boolean hasNext() {
             if (next) {
                 next = false;
@@ -71,19 +56,23 @@ class PlexusIoProxyResourceCollectionTest {
             return false;
         }
 
+        @Override
         public PlexusIoResource next() {
             return new AbstractPlexusIoResource("fud", 123, 22, true, false, false) {
-                @Nonnull
-                public InputStream getContents() {
+
+                @Override
+                public @Nullable InputStream getContents() {
                     return null;
                 }
 
-                public URL getURL() {
+                @Override
+                public @Nullable URL getURL() {
                     return null;
                 }
             };
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -94,14 +83,17 @@ class PlexusIoProxyResourceCollectionTest {
         final CloseableIterator closeableIterator = new CloseableIterator();
         PlexusIoProxyResourceCollection resCol =
                 new PlexusIoProxyResourceCollection(new AbstractPlexusIoResourceCollection() {
+                    @Override
                     public Iterator<PlexusIoResource> getResources() {
                         return closeableIterator;
                     }
 
+                    @Override
                     public Stream stream() {
                         throw new UnsupportedOperationException();
                     }
 
+                    @Override
                     public boolean isConcurrentAccessSupported() {
                         return true;
                     }

@@ -1,7 +1,5 @@
 package org.codehaus.plexus.components.io.resources;
 
-import javax.annotation.Nonnull;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,22 +20,25 @@ class AbstractPlexusIoResourceCollectionTest {
     @Test
     void getIncludes() throws Exception {
         AbstractPlexusIoResourceCollection sut = new AbstractPlexusIoResourceCollection() {
+            @Override
             public Iterator<PlexusIoResource> getResources() {
                 return Arrays.asList(getResource("r1"), getResource("r2")).iterator();
             }
 
+            @Override
             public Stream stream() {
                 throw new UnsupportedOperationException();
             }
 
+            @Override
             public boolean isConcurrentAccessSupported() {
                 return true;
             }
         };
 
         sut.setStreamTransformer(new InputStreamTransformer() {
-            @Nonnull
-            public InputStream transform(@Nonnull PlexusIoResource resource, @Nonnull final InputStream inputStream)
+            @Override
+            public InputStream transform(PlexusIoResource resource, final InputStream inputStream)
                     throws IOException {
                 final byte[] buf = new byte[2];
                 buf[0] = (byte) inputStream.read();
@@ -56,11 +57,12 @@ class AbstractPlexusIoResourceCollectionTest {
 
     private static PlexusIoResource getResource(final String r1) {
         return new AbstractPlexusIoResource(r1, 0, 0, true, false, true) {
-            @Nonnull
+            @Override
             public InputStream getContents() {
                 return new ByteArrayInputStream((r1 + "Payload").getBytes());
             }
 
+            @Override
             public URL getURL() {
                 throw new IllegalStateException("Not implemented");
             }

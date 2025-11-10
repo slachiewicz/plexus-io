@@ -1,34 +1,17 @@
 package org.codehaus.plexus.components.io.resources;
 
-/*
- * Copyright 2007 The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import javax.annotation.Nonnull;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.Iterator;
 
 import org.codehaus.plexus.components.io.attributes.PlexusIoResourceAttributes;
 import org.codehaus.plexus.components.io.functions.ContentSupplier;
 import org.codehaus.plexus.components.io.functions.InputStreamTransformer;
 import org.codehaus.plexus.components.io.functions.PlexusIoResourceConsumer;
+
+import static java.util.Collections.singleton;
 
 /**
  * Abstract base class for compressed files, aka singleton
@@ -42,10 +25,12 @@ public abstract class PlexusIoCompressedFileResourceCollection
 
     private InputStreamTransformer streamTransformers = AbstractPlexusIoResourceCollection.identityTransformer;
 
+    @Override
     public File getFile() {
         return file;
     }
 
+    @Override
     public void setFile(File file) {
         this.file = file;
     }
@@ -66,8 +51,10 @@ public abstract class PlexusIoCompressedFileResourceCollection
         this.streamTransformers = streamTransformers;
     }
 
+    @Override
     public Stream stream() {
         return new Stream() {
+            @Override
             public void forEach(PlexusIoResourceConsumer resourceConsumer) throws IOException {
 
                 final Iterator<PlexusIoResource> it = getResources();
@@ -81,6 +68,7 @@ public abstract class PlexusIoCompressedFileResourceCollection
         };
     }
 
+    @Override
     public Iterator<PlexusIoResource> getResources() throws IOException {
         final File f = getFile();
         final String p = (getPath() == null ? getName(f) : getPath()).replace('\\', '/');
@@ -94,7 +82,7 @@ public abstract class PlexusIoCompressedFileResourceCollection
         final PlexusIoResourceAttributes attributes = getAttributes(f);
 
         final ContentSupplier contentSupplier = new ContentSupplier() {
-            @Nonnull
+            @Override
             public InputStream getContents() throws IOException {
                 return getInputStream(f);
             }
@@ -102,7 +90,7 @@ public abstract class PlexusIoCompressedFileResourceCollection
 
         final PlexusIoResource resource = ResourceFactory.createResource(f, p, contentSupplier, attributes);
 
-        return Collections.singleton(resource).iterator();
+        return singleton(resource).iterator();
     }
 
     protected String getName(File file) throws IOException {
@@ -116,19 +104,22 @@ public abstract class PlexusIoCompressedFileResourceCollection
 
     protected abstract String getDefaultExtension();
 
-    protected abstract @Nonnull InputStream getInputStream(File file) throws IOException;
+    protected abstract InputStream getInputStream(File file) throws IOException;
 
+    @Override
     public InputStream getInputStream(PlexusIoResource resource) throws IOException {
         InputStream contents = resource.getContents();
         return new ClosingInputStream(streamTransformers.transform(resource, contents), contents);
     }
 
+    @Override
     public PlexusIoResource resolve(final PlexusIoResource resource) throws IOException {
         final Deferred deferred = new Deferred(
                 resource, this, streamTransformers != AbstractPlexusIoResourceCollection.identityTransformer);
         return deferred.asResource();
     }
 
+    @Override
     public Iterator<PlexusIoResource> iterator() {
         try {
             return getResources();
@@ -137,15 +128,18 @@ public abstract class PlexusIoCompressedFileResourceCollection
         }
     }
 
+    @Override
     public String getName(PlexusIoResource resource) {
         return resource.getName();
     }
 
+    @Override
     public long getLastModified() throws IOException {
         File f = getFile();
         return f == null ? PlexusIoResource.UNKNOWN_MODIFICATION_DATE : f.lastModified();
     }
 
+    @Override
     public boolean isConcurrentAccessSupported() {
         // There is a single resource in the collection so it is safe
         return true;

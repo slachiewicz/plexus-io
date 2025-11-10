@@ -1,23 +1,5 @@
 package org.codehaus.plexus.components.io.resources;
 
-/*
- * Copyright 2007 The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import javax.annotation.Nonnull;
-
 /**
  * Default implementation of {@link PlexusIoResource}.
  */
@@ -28,7 +10,7 @@ public abstract class AbstractPlexusIoResource implements PlexusIoResource {
     private final boolean isFile, isDirectory, isExisting;
 
     protected AbstractPlexusIoResource(
-            @Nonnull String name,
+            String name,
             long lastModified,
             long size,
             boolean isFile,
@@ -42,31 +24,37 @@ public abstract class AbstractPlexusIoResource implements PlexusIoResource {
         this.isExisting = isExisting;
     }
 
+    @Override
     public long getLastModified() {
         return lastModified;
     }
 
-    @Nonnull
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public long getSize() {
         return size;
     }
 
+    @Override
     public boolean isDirectory() {
         return isDirectory;
     }
 
+    @Override
     public boolean isExisting() {
         return isExisting;
     }
 
+    @Override
     public boolean isFile() {
         return isFile;
     }
 
+    @Override
     public boolean isSymbolicLink() {
         return false;
     }

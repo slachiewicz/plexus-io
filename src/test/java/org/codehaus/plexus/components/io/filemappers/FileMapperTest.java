@@ -17,7 +17,6 @@ package org.codehaus.plexus.components.io.filemappers;
  */
 
 import javax.inject.Inject;
-
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Arrays;
 
@@ -44,8 +43,8 @@ class FileMapperTest {
                 if (output == null) {
                     try {
                         pMapper.getMappedFileName(input);
-                        fail("Expected IllegalArgumentException for mapper "
-                                + pMapper.getClass().getName() + " and input: " + input);
+                        fail("Expected IllegalArgumentException for mapper " +
+                                pMapper.getClass().getName() + " and input: " + input);
                     } catch (IllegalArgumentException e) {
                         // Ok
                     }
@@ -58,13 +57,13 @@ class FileMapperTest {
             } catch (Throwable t) {
                 throw new UndeclaredThrowableException(
                         t,
-                        "Mapper " + pMapper.getClass().getName() + " failed for input " + input + ": "
-                                + t.getMessage());
+                        "Mapper " + pMapper.getClass().getName() + " failed for input " + input + ": " +
+                                t.getMessage());
             }
             if (!output.equals(result)) {
-                fail("Mapper " + pMapper.getClass().getName() + " failed for input nr. " + i
-                        + ", " + input + ": Expected " + output
-                        + ", got " + result);
+                fail("Mapper " + pMapper.getClass().getName() + " failed for input nr. " + i +
+                        ", " + input + ": Expected " + output +
+                        ", got " + result);
             }
         }
     }

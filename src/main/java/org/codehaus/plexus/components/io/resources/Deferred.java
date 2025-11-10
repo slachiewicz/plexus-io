@@ -15,8 +15,6 @@
  */
 package org.codehaus.plexus.components.io.resources;
 
-import javax.annotation.Nonnull;
-
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,12 +38,12 @@ class Deferred implements ContentSupplier, NameSupplier, SizeSupplier {
             throws IOException {
         this.resource = resource;
         this.owner = owner;
-        dfos = hasTransformer
-                ? DeferredFileOutputStream.builder()
+        dfos = hasTransformer ?
+                DeferredFileOutputStream.builder()
                         .setThreshold(5000000)
                         .setPrefix("p-archiver")
-                        .get()
-                : null;
+                        .get() :
+                null;
         if (dfos != null) {
             try (InputStream inputStream = owner.getInputStream(resource);
                     DeferredFileOutputStream closeable = dfos) {
@@ -54,35 +52,35 @@ class Deferred implements ContentSupplier, NameSupplier, SizeSupplier {
         }
     }
 
-    @Nonnull
+    @Override
     public InputStream getContents() throws IOException {
         if (dfos == null) {
             return resource.getContents();
         }
         if (dfos.isInMemory()) {
             return new ByteArrayInputStream(dfos.getData());
-        } else {
-            return new FileInputStream(dfos.getFile()) {
-                @Override
-                public void close() throws IOException {
-                    super.close();
-                    dfos.getFile().delete();
-                }
-            };
         }
+        return new FileInputStream(dfos.getFile()) {
+            @Override
+            public void close() throws IOException {
+                super.close();
+                dfos.getFile().delete();
+            }
+        };
     }
 
+    @Override
     public long getSize() {
         if (dfos == null) {
             return resource.getSize();
         }
         if (dfos.isInMemory()) {
             return dfos.getByteCount();
-        } else {
-            return dfos.getFile().length();
         }
+        return dfos.getFile().length();
     }
 
+    @Override
     public String getName() {
         return owner.getName(resource);
     }

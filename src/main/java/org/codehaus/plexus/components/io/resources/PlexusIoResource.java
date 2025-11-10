@@ -1,23 +1,5 @@
 package org.codehaus.plexus.components.io.resources;
 
-/*
- * Copyright 2007 The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import javax.annotation.Nonnull;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -57,16 +39,19 @@ public interface PlexusIoResource extends FileInfo, SizeSupplier, ContentSupplie
      * Returns the resources size, if known. Otherwise returns
      * {@link #UNKNOWN_RESOURCE_SIZE}.
      */
+    @Override
     long getSize();
 
     /**
      * Returns, whether the {@link FileInfo} refers to a file.
      */
+    @Override
     boolean isFile();
 
     /**
      * Returns, whether the {@link FileInfo} refers to a directory.
      */
+    @Override
     boolean isDirectory();
 
     /**
@@ -77,7 +62,7 @@ public interface PlexusIoResource extends FileInfo, SizeSupplier, ContentSupplie
      * Please note that this InputStream is unbuffered. Clients should wrap this in a
      * BufferedInputStream or attempt reading reasonably large chunks (8K+).
      */
-    @Nonnull
+    @Override
     InputStream getContents() throws IOException;
 
     /**

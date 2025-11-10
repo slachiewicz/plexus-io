@@ -17,7 +17,6 @@ package org.codehaus.plexus.components.io.filemappers;
  */
 
 import javax.inject.Inject;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -111,13 +110,6 @@ class ResourcesTest {
         }
     }
 
-    private void createZipFile(File dest, File dir) throws IOException {
-        FileOutputStream fos = new FileOutputStream(dest);
-        ZipOutputStream zos = new ZipOutputStream(fos);
-        addDirToZipFile(zos, dir, null);
-        zos.close();
-    }
-
     private void compare(InputStream in, File file) throws IOException {
         try (InputStream fIn = Files.newInputStream(file.toPath())) {
             for (; ; ) {
@@ -150,8 +142,6 @@ class ResourcesTest {
 
     private void testPlexusIoResourceCollection(PlexusIoResourceCollection plexusIoResourceCollection)
             throws IOException {
-        boolean xPathSeen = false;
-        boolean yPathSeen = false;
         boolean aFileSeen = false;
         boolean bFileSeen = false;
         Iterator<PlexusIoResource> iter = plexusIoResourceCollection.getResources();
@@ -161,9 +151,7 @@ class ResourcesTest {
             if (res.isDirectory()) {
                 assertFalse(res.isFile(), "The directory " + resName + " is a file.");
                 if (X_PATH.equals(resName)) {
-                    xPathSeen = true;
                 } else if (Y_PATH.equals(resName)) {
-                    yPathSeen = true;
                 } else if (resName.isEmpty() || ".".equals(resName)) {
                     // Ignore me
                 } else {
@@ -189,8 +177,8 @@ class ResourcesTest {
 
         assertTrue(aFileSeen);
         assertTrue(bFileSeen);
-        if (iter instanceof Closeable) {
-            ((Closeable) iter).close();
+        if (iter instanceof Closeable closeable) {
+            closeable.close();
         }
     }
 

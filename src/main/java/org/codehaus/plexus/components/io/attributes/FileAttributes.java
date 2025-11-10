@@ -1,24 +1,5 @@
 package org.codehaus.plexus.components.io.attributes;
 
-/*
- * Copyright 2007 The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
@@ -28,11 +9,15 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.Principal;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.jspecify.annotations.Nullable;
+
+import static java.util.Collections.emptySet;
+import static java.util.Collections.synchronizedMap;
 
 /*
  * File attributes
@@ -71,26 +56,26 @@ public class FileAttributes implements PlexusIoResourceAttributes {
     private final FileTime lastModifiedTime;
 
     private static final Map<FileSystem, Map<Integer, String>> UIDS_CACHE =
-            Collections.synchronizedMap(new WeakHashMap<>());
+            synchronizedMap(new WeakHashMap<>());
 
     private static final Map<FileSystem, Map<Integer, String>> GIDS_CACHE =
-            Collections.synchronizedMap(new WeakHashMap<>());
+            synchronizedMap(new WeakHashMap<>());
 
     /**
      * @deprecated use {@link #FileAttributes(File)} and remove the unused userCache and groupCache parameters
      */
     @Deprecated
     public FileAttributes(
-            @Nonnull File file, @Nonnull Map<Integer, String> userCache, @Nonnull Map<Integer, String> groupCache)
+            File file, Map<Integer, String> userCache, Map<Integer, String> groupCache)
             throws IOException {
         this(file);
     }
 
-    public FileAttributes(@Nonnull File file) throws IOException {
+    public FileAttributes(File file) throws IOException {
         this(file.toPath(), false);
     }
 
-    public FileAttributes(@Nonnull File file, boolean followLinks) throws IOException {
+    public FileAttributes(File file, boolean followLinks) throws IOException {
         this(file.toPath(), followLinks);
     }
 
@@ -102,7 +87,7 @@ public class FileAttributes implements PlexusIoResourceAttributes {
         return GIDS_CACHE.computeIfAbsent(fs, f -> new ConcurrentHashMap<>());
     }
 
-    public FileAttributes(@Nonnull Path path, boolean followLinks) throws IOException {
+    public FileAttributes(Path path, boolean followLinks) throws IOException {
         LinkOption[] options = followLinks ? FOLLOW_LINK_OPTIONS : NOFOLLOW_LINK_OPTIONS;
         Set<String> views = path.getFileSystem().supportedFileAttributeViews();
         String names;
@@ -149,19 +134,18 @@ public class FileAttributes implements PlexusIoResourceAttributes {
         this.regularFile = (Boolean) attrs.get("isRegularFile");
         this.directory = (Boolean) attrs.get("isDirectory");
         this.other = (Boolean) attrs.get("isOther");
-        this.octalMode = attrs.containsKey("mode")
-                ? (Integer) attrs.get("mode") & 0xfff
-                : PlexusIoResourceAttributes.UNKNOWN_OCTAL_MODE;
+        this.octalMode = attrs.containsKey("mode") ?
+                (Integer) attrs.get("mode") & 0xfff :
+                PlexusIoResourceAttributes.UNKNOWN_OCTAL_MODE;
         //noinspection unchecked
-        this.permissions = attrs.containsKey("permissions")
-                ? (Set<PosixFilePermission>) attrs.get("permissions")
-                : Collections.emptySet();
+        this.permissions = attrs.containsKey("permissions") ?
+                (Set<PosixFilePermission>) attrs.get("permissions") :
+                emptySet();
         this.size = (Long) attrs.get("size");
         this.lastModifiedTime = (FileTime) attrs.get("lastModifiedTime");
     }
 
-    @Nullable
-    private static String getPrincipalName(Path path, String attribute) {
+    private static @Nullable String getPrincipalName(Path path, String attribute) {
         try {
             Object owner = Files.getAttribute(path, attribute, LinkOption.NOFOLLOW_LINKS);
             return ((Principal) owner).getName();
@@ -199,12 +183,12 @@ public class FileAttributes implements PlexusIoResourceAttributes {
         this.lastModifiedTime = lastModifiedTime;
     }
 
-    public static @Nonnull PlexusIoResourceAttributes uncached(@Nonnull File file) throws IOException {
+    public static PlexusIoResourceAttributes uncached(File file) throws IOException {
         return new FileAttributes(file);
     }
 
-    @Nullable
-    public Integer getGroupId() {
+    @Override
+    public @Nullable Integer getGroupId() {
 
         return groupId;
     }
@@ -217,19 +201,22 @@ public class FileAttributes implements PlexusIoResourceAttributes {
         return false;
     }
 
-    @Nullable
-    public String getGroupName() {
+    @Override
+    public @Nullable String getGroupName() {
         return groupName;
     }
 
+    @Override
     public Integer getUserId() {
         return userId;
     }
 
+    @Override
     public String getUserName() {
         return userName;
     }
 
+    @Override
     public boolean isGroupExecutable() {
         return containsPermission(PosixFilePermission.GROUP_EXECUTE);
     }
@@ -238,38 +225,47 @@ public class FileAttributes implements PlexusIoResourceAttributes {
         return permissions.contains(groupExecute);
     }
 
+    @Override
     public boolean isGroupReadable() {
         return containsPermission(PosixFilePermission.GROUP_READ);
     }
 
+    @Override
     public boolean isGroupWritable() {
         return containsPermission(PosixFilePermission.GROUP_WRITE);
     }
 
+    @Override
     public boolean isOwnerExecutable() {
         return containsPermission(PosixFilePermission.OWNER_EXECUTE);
     }
 
+    @Override
     public boolean isOwnerReadable() {
         return containsPermission(PosixFilePermission.OWNER_READ);
     }
 
+    @Override
     public boolean isOwnerWritable() {
         return containsPermission(PosixFilePermission.OWNER_WRITE);
     }
 
+    @Override
     public boolean isWorldExecutable() {
         return containsPermission(PosixFilePermission.OTHERS_EXECUTE);
     }
 
+    @Override
     public boolean isWorldReadable() {
         return containsPermission(PosixFilePermission.OTHERS_READ);
     }
 
+    @Override
     public boolean isWorldWritable() {
         return containsPermission(PosixFilePermission.OTHERS_WRITE);
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(System.lineSeparator());
@@ -292,6 +288,7 @@ public class FileAttributes implements PlexusIoResourceAttributes {
         return sb.toString();
     }
 
+    @Override
     public int getOctalMode() {
         return octalMode;
     }
@@ -342,6 +339,7 @@ public class FileAttributes implements PlexusIoResourceAttributes {
         return Integer.toString(getOctalMode(), 8);
     }
 
+    @Override
     public boolean isSymbolicLink() {
         return symbolicLink;
     }

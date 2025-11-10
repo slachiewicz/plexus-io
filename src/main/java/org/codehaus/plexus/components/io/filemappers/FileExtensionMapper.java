@@ -1,22 +1,5 @@
 package org.codehaus.plexus.components.io.filemappers;
 
-/*
- * Copyright 2007 The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import javax.annotation.Nonnull;
 import javax.inject.Named;
 
 /**
@@ -60,8 +43,8 @@ public class FileExtensionMapper extends AbstractFileMapper {
         return targetExtension;
     }
 
-    @Nonnull
-    public String getMappedFileName(@Nonnull String pName) {
+    @Override
+    public String getMappedFileName(String pName) {
         final String ext = getTargetExtension();
         if (ext == null) {
             throw new IllegalStateException("The target extension has not been set.");
@@ -71,8 +54,7 @@ public class FileExtensionMapper extends AbstractFileMapper {
         final int offset = pName.lastIndexOf('.');
         if (offset <= dirSep) {
             return name + ext;
-        } else {
-            return name.substring(0, offset) + ext;
         }
+        return name.substring(0, offset) + ext;
     }
 }

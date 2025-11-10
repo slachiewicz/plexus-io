@@ -1,7 +1,5 @@
 package org.codehaus.plexus.components.io.resources.proxy;
 
-import javax.annotation.Nonnull;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -78,10 +76,11 @@ class ProxyFactoryTest {
     }
 
     static class Dummy extends PlexusIoFileResource implements SymlinkDestinationSupplier {
-        public Dummy(@Nonnull File file, @Nonnull PlexusIoResourceAttributes attrs) throws IOException {
+        public Dummy(File file, PlexusIoResourceAttributes attrs) throws IOException {
             super(file, file.getName(), attrs);
         }
 
+        @Override
         public String getSymlinkDestination() {
             throw new IllegalStateException("Unsupported");
         }

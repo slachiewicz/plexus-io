@@ -1,22 +1,6 @@
 package org.codehaus.plexus.components.io.attributes;
 
-/*
- * Copyright 2007 The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /*
  * A very simple pojo based PlexusIoResourceAttributes without any kind of backing
@@ -59,60 +43,72 @@ public class SimpleResourceAttributes implements PlexusIoResourceAttributes {
 
     SimpleResourceAttributes() {}
 
+    @Override
     public int getOctalMode() {
         return mode;
     }
 
-    @Nullable
-    public Integer getGroupId() {
+    @Override
+    public @Nullable Integer getGroupId() {
         return gid;
     }
 
-    @Nullable
-    public String getGroupName() {
+    @Override
+    public @Nullable String getGroupName() {
         return groupName;
     }
 
+    @Override
     public Integer getUserId() {
         return uid;
     }
 
+    @Override
     public String getUserName() {
         return userName;
     }
 
+    @Override
     public boolean isGroupExecutable() {
         return PlexusIoResourceAttributeUtils.isGroupExecutableInOctal(mode);
     }
 
+    @Override
     public boolean isGroupReadable() {
         return PlexusIoResourceAttributeUtils.isGroupReadableInOctal(mode);
     }
 
+    @Override
     public boolean isGroupWritable() {
         return PlexusIoResourceAttributeUtils.isGroupWritableInOctal(mode);
     }
 
+    @Override
     public boolean isOwnerExecutable() {
         return PlexusIoResourceAttributeUtils.isOwnerExecutableInOctal(mode);
     }
 
+    @Override
     public boolean isOwnerReadable() {
         return PlexusIoResourceAttributeUtils.isOwnerReadableInOctal(mode);
     }
 
+    @Override
     public boolean isOwnerWritable() {
         return PlexusIoResourceAttributeUtils.isOwnerWritableInOctal(mode);
     }
 
+    @Override
     public boolean isWorldExecutable() {
         return PlexusIoResourceAttributeUtils.isWorldExecutableInOctal(mode);
     }
 
+    @Override
     public boolean isWorldReadable() {
         return PlexusIoResourceAttributeUtils.isWorldReadableInOctal(mode);
     }
 
+    @Override
     public boolean isWorldWritable() {
         return PlexusIoResourceAttributeUtils.isWorldWritableInOctal(mode);
     }
@@ -151,6 +147,7 @@ public class SimpleResourceAttributes implements PlexusIoResourceAttributes {
         return this;
     }
 
+    @Override
     public String toString() {
         return String.format(
                 "%nResource Attributes:%n------------------------------%nuser: %s%ngroup: %s%nuid: %d%ngid: %d%nmode: %06o",
@@ -165,6 +162,7 @@ public class SimpleResourceAttributes implements PlexusIoResourceAttributes {
         this.isSymbolicLink = isSymbolicLink;
     }
 
+    @Override
     public boolean isSymbolicLink() {
         return isSymbolicLink;
     }

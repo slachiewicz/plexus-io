@@ -1,23 +1,5 @@
 package org.codehaus.plexus.components.io.resources.proxy;
 
-/*
- * Copyright 2007 The Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import javax.annotation.Nonnull;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Iterator;
@@ -44,7 +26,7 @@ public class PlexusIoProxyResourceCollection extends AbstractPlexusIoResourceCol
         implements EncodingSupported {
     private final PlexusIoResourceCollection src;
 
-    public PlexusIoProxyResourceCollection(@Nonnull PlexusIoResourceCollection src) {
+    public PlexusIoProxyResourceCollection(PlexusIoResourceCollection src) {
         this.src = src;
     }
 
@@ -119,12 +101,13 @@ public class PlexusIoProxyResourceCollection extends AbstractPlexusIoResourceCol
         /**
          * Returns the next resource or null if no next resource;
          */
+        @Override
         protected PlexusIoResource getNextResource() throws IOException {
             if (!iter.hasNext()) return null;
             PlexusIoResource plexusIoResource = iter.next();
 
-            while ((!fileSelector.isSelected(plexusIoResource) || !isSelected(plexusIoResource))
-                    || (plexusIoResource.isDirectory() && !isIncludingEmptyDirectories())) {
+            while ((!fileSelector.isSelected(plexusIoResource) || !isSelected(plexusIoResource)) ||
+                    (plexusIoResource.isDirectory() && !isIncludingEmptyDirectories())) {
                 if (!iter.hasNext()) return null;
                 plexusIoResource = iter.next();
             }
@@ -144,10 +127,12 @@ public class PlexusIoProxyResourceCollection extends AbstractPlexusIoResourceCol
 
                 final PlexusIoResourceAttributes attrs2 = attrs;
                 DualSupplier supplier = new DualSupplier() {
+                    @Override
                     public String getName() {
                         return prefix + name;
                     }
 
+                    @Override
                     public PlexusIoResourceAttributes getAttributes() {
                         return attrs2;
                     }
@@ -158,16 +143,19 @@ public class PlexusIoProxyResourceCollection extends AbstractPlexusIoResourceCol
         }
     }
 
+    @Override
     public Stream stream() {
         return getSrc().stream();
     }
 
+    @Override
     public Iterator<PlexusIoResource> getResources() throws IOException {
         return new FwdIterator(getSrc().getResources());
     }
 
     abstract static class DualSupplier implements NameSupplier, ResourceAttributeSupplier {}
 
+    @Override
     public String getName(final PlexusIoResource resource) {
         String name = resource.getName();
         final FileMapper[] mappers = getFileMappers();
@@ -183,16 +171,19 @@ public class PlexusIoProxyResourceCollection extends AbstractPlexusIoResourceCol
         return name;
     }
 
+    @Override
     public long getLastModified() throws IOException {
         return src.getLastModified();
     }
 
+    @Override
     public void setEncoding(Charset charset) {
         if (src instanceof EncodingSupported) {
             ((EncodingSupported) src).setEncoding(charset);
         }
     }
 
+    @Override
     public boolean isConcurrentAccessSupported() {
         return src.isConcurrentAccessSupported();
     }
